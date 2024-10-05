@@ -14,6 +14,9 @@ export async function POST(request: NextRequest) {
 
   const prompt = `Generate a ${language} code snippet for a practical with the following details:
 ${aim ? `Aim: ${aim}` : ''}
+if code asks for the user input, remove the input statement and use the hardcoded values.
+
+In case of java always user public class Main and public static void main(String[] args) method.
 Please provide a concise and relevant code only no markdown or comments.`
 
   try {
