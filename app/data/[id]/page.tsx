@@ -397,7 +397,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
             {Array.from({ length: practicalCount }).map((_, index) => (
               <Card key={index} className="p-4">
                 <CardTitle className="text-xl font-bold mb-4">
-                  Practical {index + 1}
+                  Block {index + 1}
                 </CardTitle>
                 <div className="space-y-4">
                   {Object.entries(mappings).map(([placeholder, field]) => (
