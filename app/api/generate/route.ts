@@ -96,31 +96,35 @@ function formatCodeForWord(code: string): string {
 }
 
 async function combineDocuments(documents: Buffer[]): Promise<Buffer> {
-  const zip = new JSZip()
-  await zip.loadAsync(documents[0])
+  const zip = new JSZip();
+  await zip.loadAsync(documents[0]);
 
   for (let i = 1; i < documents.length; i++) {
-    const docZip = await JSZip.loadAsync(documents[i])
-    const contentXml = await docZip.file('word/document.xml')?.async('string')
+    const docZip = await JSZip.loadAsync(documents[i]);
+    const contentXml = await docZip.file('word/document.xml')?.async('string');
     if (contentXml) {
-      const baseContentXml = await zip.file('word/document.xml')?.async('string')
+      const baseContentXml = await zip.file('word/document.xml')?.async('string');
       if (baseContentXml) {
-        const newContent = mergeDocumentXml(baseContentXml, contentXml)
-        zip.file('word/document.xml', newContent)
+        const newContent = mergeDocumentXml(baseContentXml, contentXml);
+        zip.file('word/document.xml', newContent);
       }
     }
 
     // Copy media files from each document
-    const mediaFiles = await docZip.folder('word/media')?.files()
-    if (mediaFiles) {
-      for (const [filename, file] of Object.entries(mediaFiles)) {
-        const content = await file.async('nodebuffer')
-        zip.file(`word/media/${filename}`, content)
-      }
-    }
+    // const mediaFolder = docZip.folder('word/media');
+    // if (mediaFolder) {
+    //   const mediaFiles = mediaFolder.files;
+    //   for (const filename in mediaFiles) {
+    //     if (mediaFiles.hasOwnProperty(filename)) {
+    //       const file = mediaFiles[filename];
+    //       const content = await file.async('nodebuffer');
+    //       zip.file(`word/media/${filename}`, content);
+    //     }
+    //   }
+    // }
   }
 
-  return zip.generateAsync({ type: 'nodebuffer' })
+  return zip.generateAsync({ type: 'nodebuffer' });
 }
 
 function mergeDocumentXml(baseXml: string, newXml: string): string {
