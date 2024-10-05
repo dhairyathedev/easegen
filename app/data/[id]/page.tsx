@@ -318,7 +318,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
         </CardHeader>
         <CardContent>
           <div className="mb-4">
-            <Label htmlFor="practicalCount">Number of Practicals</Label>
+            <Label htmlFor="practicalCount">Number of Practicalss</Label>
             <Input
               id="practicalCount"
               type="number"
