@@ -5,9 +5,16 @@ import Docxtemplater from 'docxtemplater'
 import PizZip from 'pizzip'
 import { v4 as uuidv4 } from 'uuid'
 import JSZip from 'jszip'
+import ImageModule from 'docxtemplater-image-module-free'
 
 export async function POST(request: NextRequest) {
-  const { id, practicalData } = await request.json()
+  const formData = await request.formData()
+  const id = formData.get('id') as string
+  const practicalDataJson = formData.get('practicalData') as string
+  const fieldTypesJson = formData.get('fieldTypes') as string
+
+  const practicalData = JSON.parse(practicalDataJson)
+  const fieldTypes = JSON.parse(fieldTypesJson)
 
   const templatePath = path.join(process.cwd(), 'uploads', `${id}.docx`)
   const mappingsPath = path.join(process.cwd(), 'mappings', `${id}.json`)
@@ -19,6 +26,20 @@ export async function POST(request: NextRequest) {
 
     const documents = await Promise.all(practicalData.map(async (practical: any, index: number) => {
       const zip = new PizZip(templateContent)
+
+      const imageModule = new ImageModule({
+        centered: false,
+        getImage: async (tagValue: string) => {
+          const imageFile = formData.get(tagValue) as File
+          if (imageFile) {
+            const arrayBuffer = await imageFile.arrayBuffer()
+            return arrayBuffer
+          }
+          return null
+        },
+        getSize: () => [150, 150],
+      })
+
       const doc = new Docxtemplater(zip, { 
         paragraphLoop: true, 
         linebreaks: true,
@@ -26,12 +47,20 @@ export async function POST(request: NextRequest) {
           start: '{{',
           end: '}}',
         },
+        modules: [imageModule],
       })
 
-      const data = Object.entries(mappings).reduce((acc, [placeholder, field]) => {
-        acc[placeholder.replace(/[{}]/g, '')] = practical[field] || ''
-        return acc
-      }, {} as Record<string, string>)
+      const data: Record<string, any> = {}
+
+      for (const [placeholder, field] of Object.entries(mappings)) {
+        if (fieldTypes[field].isCode) {
+          data[placeholder.replace(/[{}]/g, '')] = formatCodeForWord(practical[field] || '')
+        } else if (fieldTypes[field].isImage) {
+          data[placeholder.replace(/[{}]/g, '')] = `image_${index}_${field}`
+        } else {
+          data[placeholder.replace(/[{}]/g, '')] = practical[field] || ''
+        }
+      }
 
       data['practical_number'] = `Practical-${index + 1}`
 
@@ -61,13 +90,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function formatCodeForWord(code: string): string {
+  const lines = code.split('\n')
+  return lines.join('\n')
+}
+
 async function combineDocuments(documents: Buffer[]): Promise<Buffer> {
   const zip = new JSZip()
-
-  // Load the first document as the base
   await zip.loadAsync(documents[0])
 
-  // Merge the content of subsequent documents
   for (let i = 1; i < documents.length; i++) {
     const docZip = await JSZip.loadAsync(documents[i])
     const contentXml = await docZip.file('word/document.xml')?.async('string')
@@ -78,9 +109,17 @@ async function combineDocuments(documents: Buffer[]): Promise<Buffer> {
         zip.file('word/document.xml', newContent)
       }
     }
+
+    // Copy media files from each document
+    const mediaFiles = await docZip.folder('word/media')?.files()
+    if (mediaFiles) {
+      for (const [filename, file] of Object.entries(mediaFiles)) {
+        const content = await file.async('nodebuffer')
+        zip.file(`word/media/${filename}`, content)
+      }
+    }
   }
 
-  // Generate the final document
   return zip.generateAsync({ type: 'nodebuffer' })
 }
 
@@ -88,12 +127,6 @@ function mergeDocumentXml(baseXml: string, newXml: string): string {
   const bodyRegex = /<w:body>([\s\S]*)<\/w:body>/
   const baseBody = baseXml.match(bodyRegex)?.[1] || ''
   const newBody = newXml.match(bodyRegex)?.[1] || ''
-
-  // Remove the last paragraph (usually a section break) from the base document
-  const trimmedBaseBody = baseBody.replace(/<w:p[^>]*>(?:(?!<w:p)[\s\S])*<\/w:p>$/, '')
-
-  // Add a page break before the new content
   const pageBreak = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
-
-  return baseXml.replace(bodyRegex, `<w:body>${trimmedBaseBody}${pageBreak}${newBody}</w:body>`)
+  return baseXml.replace(bodyRegex, `<w:body>${baseBody}${pageBreak}${newBody}</w:body>`)
 }
