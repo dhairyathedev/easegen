@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -49,7 +51,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
       .then((data) => {
         setMappings(data.mappings);
         const initialFieldTypes: Record<string, FieldType> = {};
-        Object.values(data.mappings).forEach((field) => {
+        Object.values(data.mappings).forEach((field: any) => {
           initialFieldTypes[field] = {
             name: field,
             isCode: false,
@@ -460,7 +462,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
                               fieldTypes[field].defaultLanguage || "cpp"
                             }
                             placeholder="Enter your code here"
-                            onChange={(evn) =>
+                            onChange={(e) =>
                               handleDataChange(index, field, e.target.value)
                             }
                             padding={15}
