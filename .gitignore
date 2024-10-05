@@ -6,6 +6,11 @@
 .pnp.js
 .yarn/install-state.gz
 
+# misc
+uploads
+mappings
+output
+
 # testing
 /coverage
 

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const mappingsContent = await readFile(mappingsPath, 'utf-8')
     const mappings = JSON.parse(mappingsContent)
 
-    const documents = await Promise.all(practicalData.map(async (practical, index) => {
+    const documents = await Promise.all(practicalData.map(async (practical: any, index: number) => {
       const zip = new PizZip(templateContent)
       const doc = new Docxtemplater(zip, { 
         paragraphLoop: true, 
@@ -92,5 +92,8 @@ function mergeDocumentXml(baseXml: string, newXml: string): string {
   // Remove the last paragraph (usually a section break) from the base document
   const trimmedBaseBody = baseBody.replace(/<w:p[^>]*>(?:(?!<w:p)[\s\S])*<\/w:p>$/, '')
 
-  return baseXml.replace(bodyRegex, `<w:body>${trimmedBaseBody}${newBody}</w:body>`)
+  // Add a page break before the new content
+  const pageBreak = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
+
+  return baseXml.replace(bodyRegex, `<w:body>${trimmedBaseBody}${pageBreak}${newBody}</w:body>`)
 }
