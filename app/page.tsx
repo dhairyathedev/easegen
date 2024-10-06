@@ -7,14 +7,14 @@ export default function Home() {
     <div className="max-w-screen-xl mx-auto m-2 p-4">
       <nav className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">EaseGen</h1>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-8">
           <Link
             href="/documentation"
-            className="text-lg font-medium hover:underline"
+            className="font-medium hover:underline"
           >
             Documentation
           </Link>
-          <Button className="font-semibold" variant="secondary">
+          <Button className="font-semibold" variant="secondary" size="lg">
             Register
           </Button>
         </div>
@@ -33,20 +33,22 @@ export default function Home() {
             solution.
           </h3>
           <div className="flex items-center justify-center space-x-10 mt-8">
-            <Button className="font-semibold" variant="secondary">
+            <Button className="font-semibold" variant="secondary" size="lg">
               Demo Video
             </Button>
-              <Link href="/upload">
-            <Button className="gap-x-1 font-semibold px-5">
-              Try now <IconSparkles stroke={2} />
-            </Button>
-              </Link>
+            <Link href="/upload">
+              <Button className="gap-x-1 font-semibold px-5" size={"lg"}>
+                Try now <IconSparkles stroke={2} />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      
+      <div className="max-w-3xl bg-red-400 h-3 mx-auto mt-20">
+
+      </div>
     </div>
   );
 }
