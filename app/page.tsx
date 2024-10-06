@@ -46,7 +46,7 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <div className="max-w-3xl bg-red-400 h-3 mx-auto mt-20">
+      <div className="max-w-3xl bg-primary/30 h-3 mx-auto mt-20 p-4">
 
       </div>
     </div>
