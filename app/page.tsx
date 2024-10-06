@@ -34,16 +34,18 @@ export default function Home() {
           </h3>
           <div className="flex items-center justify-center space-x-10 mt-8">
             <Button className="font-semibold" variant="secondary">
-              Register
+              Demo Video
             </Button>
             <Button className="gap-x-1 font-semibold px-5">
+              <Link href="/upload">
               Try now <IconSparkles stroke={2} />
+              </Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
+      {/* How it works */}
       
     </div>
   );
