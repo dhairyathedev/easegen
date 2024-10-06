@@ -36,11 +36,11 @@ export default function Home() {
             <Button className="font-semibold" variant="secondary">
               Demo Video
             </Button>
-            <Button className="gap-x-1 font-semibold px-5">
               <Link href="/upload">
+            <Button className="gap-x-1 font-semibold px-5">
               Try now <IconSparkles stroke={2} />
-              </Link>
             </Button>
+              </Link>
           </div>
         </div>
       </section>
