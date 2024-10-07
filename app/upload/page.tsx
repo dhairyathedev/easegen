@@ -1,17 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<{ email: string; created_at: string } | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
+  const supabase = createClientComponentClient()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -19,6 +22,21 @@ export default function Upload() {
       setError(null)
     }
   }
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login')
+      }else{
+        setUser({
+          email: user.email!,
+          created_at: new Date(user.created_at).toLocaleString(),
+        })
+      }
+    }
+    checkUser()
+  }, [supabase, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,6 +69,9 @@ export default function Upload() {
     }
   }
 
+  if(!user){
+    return <div>Loading...</div>
+  }
   return (
     <div className="container mx-auto p-4">
       <Card>
