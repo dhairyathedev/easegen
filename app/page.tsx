@@ -46,7 +46,7 @@ export default function Home() {
             <Button className="font-semibold" variant="secondary" size="lg">
               Demo Video
             </Button>
-            <Link href="/upload">
+            <Link href="/dashboard">
               <Button className="gap-x-1 font-semibold px-5" size={"lg"}>
                 Try now <IconSparkles stroke={2} />
               </Button>
