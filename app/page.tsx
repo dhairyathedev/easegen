@@ -52,9 +52,9 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <div className="max-w-5xl h-[600px] mx-auto mt-20 p-4">
-        <div className="grid grid-cols-12 grid-rows-4 gap-4 items-center w-full bg-primary/10 h-full p-4 rounded-xl">
-          <div className="col-span-4 row-span-4 bg-primary rounded-xl h-full w-full p-5 px-6 text-white relative">
+      <div className="max-w-5xl md:h-[600px] h-full mx-auto mt-20 p-4">
+        <div className="grid md:grid-cols-12 md:grid-rows-4 gap-4 items-center w-full bg-primary/10 h-full p-4 rounded-xl">
+          <div className="col-span-4 row-span-4 bg-primary rounded-xl h-80 md:h-full w-full p-5 px-6 text-white relative">
             <h3 className="text-5xl mt-2 font-semibold max-w-3xl leading-tight">
               How it works?
             </h3>
@@ -62,7 +62,7 @@ export default function Home() {
               <IconRobot size={80} stroke={1} />
             </div>
           </div>
-          <div className="col-span-4 row-span-2 bg-primary rounded-xl h-full w-full p-5 px-6 text-white relative">
+          <div className="col-span-4 row-span-2 bg-primary rounded-xl h-72 md:h-full w-full p-5 px-6 text-white relative">
             <h3 className="text-5xl mt-2 font-semibold max-w-3xl leading-tight">
               1.
             </h3>
@@ -73,18 +73,18 @@ export default function Home() {
               Upload your format
             </h4>
           </div>
-          <div className="col-span-4 row-span-3 bg-primary rounded-xl h-full w-full p-5 px-6 text-white relative">
+          <div className="col-span-4 row-span-3 bg-primary rounded-xl h-80 md:h-full w-full p-5 px-6 text-white relative">
             <h3 className="text-5xl mt-2 font-semibold max-w-3xl leading-tight">
               2.
             </h3>
-            <div className="inset-0 flex justify-center items-center mt-20">
+            <div className="inset-0 flex justify-center items-center mt-8 md:mt-20">
               <IconTransformPoint size={80} stroke={1} />
             </div>
             <h4 className="text-center font-semibold text-lg mt-4">
               Map Fields with respective functionality
             </h4>
           </div>
-          <div className="col-span-4 row-span-2 bg-primary rounded-xl h-full w-full p-5 px-6 text-white relative">
+          <div className="col-span-4 row-span-2 bg-primary rounded-xl h-72 md:h-full w-full p-5 px-6 text-white relative">
             <h3 className="text-5xl mt-2 font-semibold max-w-3xl leading-tight">
               3.
             </h3>
@@ -95,13 +95,16 @@ export default function Home() {
               AI Code Generation and Execution
             </h4>
           </div>
-          <div className="col-span-4 row-span-1 bg-primary rounded-xl h-full w-full p-5 px-6 text-white flex space-x-14">
+          <div className="col-span-4 row-span-1 bg-primary rounded-xl h-72 md:h-full w-full p-5 px-6 text-white md:flex block md:space-x-14">
             <h3 className="text-5xl mt-2 font-semibold max-w-3xl leading-tight">
               4.
             </h3>
-            <div className="inset-0 flex justify-center items-center">
+            <div className="inset-0 flex justify-center items-center md:mt-0 mt-8">
               <IconFileExport size={70} stroke={1.4} />
             </div>
+            <h4 className="text-center font-semibold mt-4 md:hidden block">
+              Export and Download
+            </h4>
           </div>
           {/* <div className="col-span- row-span-3 bg-primary/30 rounded-3xl text-center h-48 w-20">Artist Name</div> */}
           {/* <div className="col-span- row-span- bg-primary/30 rounded-3xl text-center h-48 w-20">User Name</div> */}
