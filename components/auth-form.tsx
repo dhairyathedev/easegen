@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -104,8 +105,6 @@ export default function AuthForm() {
     }
   }
 
-  
-
   return (
     <Card className="w-[350px]">
       <CardHeader>
@@ -147,9 +146,16 @@ export default function AuthForm() {
                 )}
               />
               <TabsContent value="login">
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Log in"}
-                </Button>
+                <div className="space-y-4">
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Logging in..." : "Log in"}
+                  </Button>
+                  <div className="text-center">
+                    <Link href="/auth/reset-password" className="text-sm text-primary hover:underline">
+                      Forgot your password?
+                    </Link>
+                  </div>
+                </div>
               </TabsContent>
               <TabsContent value="signup">
                 <Button type="button" className="w-full" disabled={isLoading} onClick={form.handleSubmit((values) => onSubmit(values, 'signup'))}>
