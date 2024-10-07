@@ -8,6 +8,7 @@ import {
   IconSparkles,
   IconTransformPoint,
 } from "@tabler/icons-react";
+import { RoughNotation } from "react-rough-notation";
 
 export default function Home() {
   return (
@@ -30,8 +31,11 @@ export default function Home() {
       <section className="flex flex-col items-center justify-center space-y-4 mt-32">
         <div className="text-center">
           <h1 className="text-4xl max-w-2xl font-bold">
-            Tired of Creating{" "}
-            <span className="text-primary">Practical Files</span> for Your
+            Tired of Creating{" "}&nbsp;
+            <RoughNotation type="highlight" show={1==1} color="#833AE1">
+            <span className="text-white">Practical Files</span>
+            </RoughNotation>&nbsp;
+             for Your
             Technical Subjects?
           </h1>
           <h3 className="text-xl mt-4">
