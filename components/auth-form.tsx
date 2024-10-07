@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -44,6 +45,28 @@ export default function AuthForm() {
     },
   })
 
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        router.push('/dashboard')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [supabase, router])
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        router.push('/dashboard')
+      }
+    }
+    checkUser()
+  }, [supabase, router])
+
   async function onSubmit(values: z.infer<typeof formSchema>, action: 'login' | 'signup') {
     setIsLoading(true)
     setMessage(null)
@@ -80,6 +103,8 @@ export default function AuthForm() {
       setIsLoading(false)
     }
   }
+
+  
 
   return (
     <Card className="w-[350px]">
