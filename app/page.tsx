@@ -18,9 +18,11 @@ export default function Home() {
           <Link href="/documentation" className="font-medium hover:underline">
             Documentation
           </Link>
+          <Link href="/login">
           <Button className="font-semibold" variant="secondary" size="lg">
             Register
           </Button>
+          </Link>
         </div>
       </nav>
 
