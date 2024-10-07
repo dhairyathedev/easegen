@@ -27,7 +27,7 @@ export default function Upload() {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        router.push('/login')
+        router.push('/auth/login')
       }else{
         setUser({
           email: user.email!,

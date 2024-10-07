@@ -33,7 +33,7 @@ export default function Dashboard() {
           created_at: new Date(user.created_at).toLocaleString(),
         });
       } else {
-        router.push("/login");
+        router.push("/auth/login");
       }
     }
     getUser();

@@ -19,7 +19,7 @@ export default function Home() {
           <Link href="/documentation" className="font-medium hover:underline">
             Documentation
           </Link>
-          <Link href="/login">
+          <Link href="/auth/login">
           <Button className="font-semibold" variant="secondary" size="lg">
             Register
           </Button>
