@@ -6,89 +6,6 @@ import Docxtemplater from 'docxtemplater'
 import PizZip from 'pizzip'
 import { v4 as uuidv4 } from 'uuid'
 import JSZip from 'jszip'
-// import ImageModule from 'docxtemplater-image-module-free'
-
-// export async function POST(request: NextRequest) {
-//   const formData = await request.formData()
-//   const id = formData.get('id') as string
-//   const practicalDataJson = formData.get('practicalData') as string
-//   const fieldTypesJson = formData.get('fieldTypes') as string
-
-//   const practicalData = JSON.parse(practicalDataJson)
-//   const fieldTypes = JSON.parse(fieldTypesJson)
-
-//   const templatePath = path.join(process.cwd(), 'uploads', `${id}.docx`)
-//   const mappingsPath = path.join(process.cwd(), 'mappings', `${id}.json`)
-
-//   try {
-//     const templateContent = await readFile(templatePath)
-//     const mappingsContent = await readFile(mappingsPath, 'utf-8')
-//     const mappings = JSON.parse(mappingsContent)
-
-//     const documents = await Promise.all(practicalData.map(async (practical: any, index: number) => {
-//       const zip = new PizZip(templateContent)
-
-//       // const imageModule = new ImageModule({
-//       //   centered: false,
-//       //   getImage: async (tagValue: string) => {
-//       //     const imageFile = formData.get(tagValue) as File
-//       //     if (imageFile) {
-//       //       const arrayBuffer = await imageFile.arrayBuffer()
-//       //       return arrayBuffer
-//       //     }
-//       //     return null
-//       //   },
-//       //   getSize: () => [150, 150],
-//       // })
-
-//       const doc = new Docxtemplater(zip, { 
-//         paragraphLoop: true, 
-//         linebreaks: true,
-//         delimiters: {
-//           start: '{{',
-//           end: '}}',
-//         },
-//       })
-
-//       const data: Record<string, any> = {}
-
-//       for (const [placeholder, field] of Object.entries(mappings)) {
-//         if (fieldTypes[field].isCode) {
-//           data[placeholder.replace(/[{}]/g, '')] = formatCodeForWord(practical[field] || '')
-//         } else if (fieldTypes[field].isImage) {
-//           data[placeholder.replace(/[{}]/g, '')] = `image_${index}_${field}`
-//         } else {
-//           data[placeholder.replace(/[{}]/g, '')] = practical[field] || ''
-//         }
-//       }
-
-//       data['practical_number'] = `Practical-${index + 1}`
-
-//       try {
-//         doc.setData(data)
-//         await doc.render()
-//         return doc.getZip().generate({ type: 'nodebuffer' })
-//       } catch (error: any) {
-//         if (error.properties && error.properties.errors) {
-//           const errorMessages = error.properties.errors.map((e: any) => e.properties.explanation).join(', ')
-//           throw new Error(`Error in Practical ${index + 1}: ${errorMessages}`)
-//         }
-//         throw error
-//       }
-//     }))
-
-//     const mergedDoc = await combineDocuments(documents)
-
-//     const fileId = uuidv4()
-//     const outputPath = path.join(process.cwd(), 'output', `${fileId}.docx`)
-//     await writeFile(outputPath, mergedDoc)
-
-//     return NextResponse.json({ fileId }, { status: 200 })
-//   } catch (error: any) {
-//     console.error('Error generating document:', error)
-//     return NextResponse.json({ error: error.message || 'Error generating document' }, { status: 500 })
-//   }
-// }
 
 interface FieldType {
   isCode: boolean;
@@ -102,7 +19,7 @@ export async function POST(request: NextRequest) {
   const fieldTypesJson = formData.get("fieldTypes") as string;
 
   const practicalData = JSON.parse(practicalDataJson);
-  const fieldTypes: Record<string, FieldType> = JSON.parse(fieldTypesJson);  // Explicit typing here
+  const fieldTypes: Record<string, FieldType> = JSON.parse(fieldTypesJson);
 
   const templatePath = path.join(process.cwd(), "uploads", `${id}.docx`);
   const mappingsPath = path.join(process.cwd(), "mappings", `${id}.json`);
@@ -110,12 +27,11 @@ export async function POST(request: NextRequest) {
   try {
     const templateContent = await readFile(templatePath);
     const mappingsContent = await readFile(mappingsPath, "utf-8");
-    const mappings: Record<string, string> = JSON.parse(mappingsContent);  // Explicit typing here
+    const mappings: Record<string, string> = JSON.parse(mappingsContent);
 
     const documents = await Promise.all(
       practicalData.map(async (practical: any, index: number) => {
         const zip = new PizZip(templateContent);
-
         const doc = new Docxtemplater(zip, {
           paragraphLoop: true,
           linebreaks: true,
@@ -126,7 +42,6 @@ export async function POST(request: NextRequest) {
         });
 
         const data: Record<string, any> = {};
-
         for (const [placeholder, field] of Object.entries(mappings)) {
           if (fieldTypes[field].isCode) {
             data[placeholder.replace(/[{}]/g, "")] = formatCodeForWord(
@@ -157,7 +72,7 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    const mergedDoc = await combineDocuments(documents);
+    const mergedDoc = await combineDocumentsWithHeaders(documents);
 
     const fileId = uuidv4();
     const outputPath = path.join(process.cwd(), "output", `${fileId}.docx`);
@@ -173,46 +88,86 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function combineDocuments(documents: Buffer[]): Promise<Buffer> {
-  const zip = new JSZip();
-  await zip.loadAsync(documents[0]);
+async function combineDocumentsWithHeaders(documents: Buffer[]): Promise<Buffer> {
+  const baseZip = new JSZip();
+  await baseZip.loadAsync(documents[0]);
 
-  for (let i = 1; i < documents.length; i++) {
-    const docZip = await JSZip.loadAsync(documents[i]);
-    const contentXml = await docZip.file('word/document.xml')?.async('string');
-    if (contentXml) {
-      const baseContentXml = await zip.file('word/document.xml')?.async('string');
-      if (baseContentXml) {
-        const newContent = mergeDocumentXml(baseContentXml, contentXml);
-        zip.file('word/document.xml', newContent);
+  // Store the header and footer content from the first document
+  const headerRefs: string[] = [];
+  const footerRefs: string[] = [];
+  const headerContents = new Map<string, string>();
+  const footerContents = new Map<string, string>();
+
+  // Extract header and footer references from the first document
+  const baseDocumentXml = await baseZip.file('word/document.xml')?.async('string');
+  if (baseDocumentXml) {
+    const headerMatches = baseDocumentXml.match(/<w:headerReference r:id=".*?" w:type=".*?"\/>/g) || [];
+    const footerMatches = baseDocumentXml.match(/<w:footerReference r:id=".*?" w:type=".*?"\/>/g) || [];
+    
+    headerRefs.push(...headerMatches);
+    footerRefs.push(...footerMatches);
+
+    // Store header and footer contents
+    for (const file of Object.values(baseZip.files)) {
+      if (file.name.startsWith('word/header')) {
+        const content = await file.async('string');
+        headerContents.set(file.name, content);
+      } else if (file.name.startsWith('word/footer')) {
+        const content = await file.async('string');
+        footerContents.set(file.name, content);
       }
     }
-
-    // Copy media files from each document
-    // const mediaFolder = docZip.folder('word/media');
-    // if (mediaFolder) {
-    //   const mediaFiles = mediaFolder.files;
-    //   for (const filename in mediaFiles) {
-    //     if (mediaFiles.hasOwnProperty(filename)) {
-    //       const file = mediaFiles[filename];
-    //       const content = await file.async('nodebuffer');
-    //       zip.file(`word/media/${filename}`, content);
-    //     }
-    //   }
-    // }
   }
 
-  return zip.generateAsync({ type: 'nodebuffer' });
+  // Combine document content
+  let combinedBody = '';
+  for (let i = 0; i < documents.length; i++) {
+    const docZip = new JSZip();
+    await docZip.loadAsync(documents[i]);
+    const contentXml = await docZip.file('word/document.xml')?.async('string');
+    
+    if (contentXml) {
+      const bodyContent = extractBodyContent(contentXml);
+      if (i > 0) {
+        combinedBody += '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
+      }
+      combinedBody += bodyContent;
+    }
+  }
+
+  // Create new document XML with combined content and original headers/footers
+  const newDocumentXml = createNewDocumentXml(combinedBody, headerRefs, footerRefs);
+  baseZip.file('word/document.xml', newDocumentXml);
+
+  return baseZip.generateAsync({ type: 'nodebuffer' });
 }
 
-function mergeDocumentXml(baseXml: string, newXml: string): string {
-  const bodyRegex = /<w:body>([\s\S]*)<\/w:body>/
-  const baseBody = baseXml.match(bodyRegex)?.[1] || ''
-  const newBody = newXml.match(bodyRegex)?.[1] || ''
-  const pageBreak = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
-  return baseXml.replace(bodyRegex, `<w:body>${baseBody}${pageBreak}${newBody}</w:body>`)
+function extractBodyContent(xml: string): string {
+  const bodyRegex = /<w:body>([\s\S]*)<\/w:body>/;
+  const bodyMatch = xml.match(bodyRegex);
+  if (bodyMatch && bodyMatch[1]) {
+    // Remove any existing section properties
+    return bodyMatch[1].replace(/<w:sectPr>[\s\S]*<\/w:sectPr>/, '');
+  }
+  return '';
 }
+
+function createNewDocumentXml(bodyContent: string, headerRefs: string[], footerRefs: string[]): string {
+  const headerRefsXml = headerRefs.join('');
+  const footerRefsXml = footerRefs.join('');
+  
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <w:body>
+    ${bodyContent}
+    <w:sectPr>
+      ${headerRefsXml}
+      ${footerRefsXml}
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+}
+
 function formatCodeForWord(code: string): string {
-  const lines = code.split('\n')
-  return lines.join('\n')
+  return code.split('\n').join('\n');
 }
