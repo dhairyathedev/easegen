@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 const CodeEditor = dynamic(
   () => import("@uiw/react-textarea-code-editor").then((mod) => mod.default),
@@ -30,6 +31,7 @@ interface FieldType {
   isImage: boolean;
   isAim: boolean;
   isOutput: boolean;
+  isConclusion?: boolean; // Added for conclusion
   defaultLanguage?: string;
 }
 
@@ -44,6 +46,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
   const [isExecuting, setIsExecuting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [conclusion, setConclusion] = useState<string>("");
 
   useEffect(() => {
     fetch(`/api/mappings/${params.id}`)
@@ -58,6 +61,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
             isImage: false,
             isAim: false,
             isOutput: false,
+            isConclusion: false,
           };
         });
         setFieldTypes(initialFieldTypes);
@@ -93,7 +97,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
 
   const handleFieldTypeChange = (
     field: string,
-    type: "isCode" | "isImage" | "isAim" | "isOutput"
+    type: "isCode" | "isImage" | "isAim" | "isOutput" | "isConclusion"
   ) => {
     setFieldTypes((prev) => ({
       ...prev,
@@ -101,13 +105,15 @@ export default function DataEntry({ params }: { params: { id: string } }) {
         ...prev[field],
         [type]: !prev[field][type],
         ...(type === "isCode"
-          ? { isImage: false, isAim: false }
+          ? { isImage: false, isAim: false, isOutput: false, isConclusion: false }
           : type === "isImage"
-          ? { isCode: false, isAim: false, isOutput: false }
+          ? { isCode: false, isAim: false, isOutput: false, isConclusion: false }
           : type === "isAim"
-          ? { isCode: false, isImage: false, isOutput: false }
+          ? { isCode: false, isImage: false, isOutput: false, isConclusion: false }
           : type === "isOutput"
-          ? { isCode: false, isImage: false, isAim: false }
+          ? { isCode: false, isImage: false, isAim: false, isConclusion: false }
+          : type === "isConclusion"
+          ? { isCode: false, isImage: false, isAim: false, isOutput: false }
           : {}),
       },
     }));
@@ -175,6 +181,45 @@ export default function DataEntry({ params }: { params: { id: string } }) {
     }
   };
 
+  const handleGenerateConclusion = async (practicalIndex: number) => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch("/api/generate-conclusion", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ practicalData }),
+      });
+
+      const data = await response.json();
+      setConclusion(data.conclusion);
+
+      if (response.ok) {
+        handleDataChange(practicalIndex, "conclusion", data.conclusion);
+      } else {
+        setError(data.error || "Conclusion generation failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("An unexpected error occurred during conclusion generation");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const formatOutput = (language: string, output: string): string => {
+    const commandMap: Record<string, string> = {
+      python: "python app.py",
+      javascript: "node app.js",
+      java: "javac Main.java && java Main",
+      cpp: "g++ main.cpp -o main && ./main",
+    };
+
+    const command = commandMap[language] || "Unknown command";
+    return `~ ${command}\n${output}`;
+  };
+
   const handleExecuteCode = async (practicalIndex: number) => {
     setIsExecuting(true);
     setError(null);
@@ -220,13 +265,12 @@ export default function DataEntry({ params }: { params: { id: string } }) {
       const data = await response.json();
 
       if (response.ok) {
-        // Poll for the result
         const result = await pollForResult(data.token);
-        handleDataChange(
-          practicalIndex,
-          outputField,
+        const formattedOutput = formatOutput(
+          language,
           result.stdout || result.stderr || "No output"
         );
+        handleDataChange(practicalIndex, outputField, formattedOutput);
       } else {
         setError(data.error || "Code execution failed");
       }
@@ -390,6 +434,16 @@ export default function DataEntry({ params }: { params: { id: string } }) {
                   />
                   <Label htmlFor={`${field}-output`}>Output</Label>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`${field}-conclusion`}
+                    checked={type.isConclusion}
+                    onCheckedChange={() =>
+                      handleFieldTypeChange(field, "isConclusion")
+                    }
+                  />
+                  <Label htmlFor={`${field}-conclusion`}>Conclusion</Label>
+                </div>
               </div>
             ))}
           </div>
@@ -474,7 +528,25 @@ export default function DataEntry({ params }: { params: { id: string } }) {
                             }}
                             readOnly={fieldTypes[field]?.isOutput}
                           />
-) : (
+) : fieldTypes[field]?.isConclusion ? (
+  <>
+  <Textarea
+    id={`${field}-${index}`}
+    value={(practicalData[index]?.[field] as string) || ""}
+    onChange={(e) => setConclusion(e.target.value)}
+    placeholder="Conclusion will appear here"
+  />
+  <div className="mt-2 space-x-2">
+                            <Button
+                              type="button"
+                              onClick={() => handleGenerateConclusion(index)}
+                              disabled={isGenerating}
+                            >
+                              Generate Conclusion
+                            </Button>
+                          </div>
+                          </>
+):  (
   <Input
     id={`${field}-${index}`}
     type="text"
