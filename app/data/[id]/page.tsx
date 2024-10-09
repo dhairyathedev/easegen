@@ -189,7 +189,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ practicalData }),
+        body: JSON.stringify({ practicalData:practicalData[practicalIndex] }),
       });
 
       const data = await response.json();
