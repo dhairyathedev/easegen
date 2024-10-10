@@ -406,16 +406,6 @@ export default function DataEntry({ params }: { params: { id: string } }) {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id={`${field}-image`}
-                    checked={type.isImage}
-                    onCheckedChange={() =>
-                      handleFieldTypeChange(field, "isImage")
-                    }
-                  />
-                  <Label htmlFor={`${field}-image`}>Image</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
                     id={`${field}-aim`}
                     checked={type.isAim}
                     onCheckedChange={() =>
