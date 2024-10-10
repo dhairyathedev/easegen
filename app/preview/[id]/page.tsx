@@ -38,6 +38,12 @@ export default function Preview({ params }: { params: { id: string } }) {
           <CardTitle className="text-2xl font-bold mb-4">Preview and Download</CardTitle>
         </CardHeader>
         <CardContent>
+          <Alert className="mb-4" variant="destructive">
+            <AlertTitle>Note</AlertTitle>
+            <AlertDescription>
+              This is currently beta version. Please download the document and open with Google Docs for the best experience.
+            </AlertDescription>
+          </Alert>
           {error ? (
             <Alert variant="destructive">
               <AlertTitle>Error</AlertTitle>
