@@ -18,7 +18,7 @@ if code asks for the user input, remove the input statement and use the hardcode
 
 In case of java always user public class Main and public static void main(String[] args) method.
 Please provide a concise and relevant code only, no markdown or comments.
-Stricly follow the above instructions, no markdown or comments are allowed in the code.
+Stricly follow the above instructions, give code in ${language}, no markdown or comments are allowed in the code.
 `
 
   try {
