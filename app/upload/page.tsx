@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import Link from 'next/link'
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null)
@@ -79,6 +80,15 @@ export default function Upload() {
           <CardTitle className="text-2xl font-bold mb-4">Upload Template</CardTitle>
         </CardHeader>
         <CardContent>
+          <Alert className="my-3">
+            <AlertTitle>Important Note</AlertTitle>
+            <AlertDescription>
+              Be sure to follow the correct format when creating your template. For more information, refer to the  
+              <Link href="/documentation" className="font-medium underline ml-1">
+              documentation.
+              </Link>
+            </AlertDescription>
+          </Alert>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="file"

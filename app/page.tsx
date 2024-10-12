@@ -43,9 +43,11 @@ export default function Home() {
             solution.
           </h3>
           <div className="flex items-center justify-center space-x-10 mt-8">
+          <Link href="/documentation">
             <Button className="font-semibold" variant="secondary" size="lg">
               Demo Video
             </Button>
+            </Link>
             <Link href="/dashboard">
               <Button className="gap-x-1 font-semibold px-5" size={"lg"}>
                 Try now <IconSparkles stroke={2} />
