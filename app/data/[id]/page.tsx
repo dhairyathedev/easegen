@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import Link from "next/link";
 
 const CodeEditor = dynamic(
   () => import("@uiw/react-textarea-code-editor").then((mod) => mod.default),
@@ -361,6 +362,15 @@ export default function DataEntry({ params }: { params: { id: string } }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
+        <Alert className="mb-3" variant="default">
+            <AlertTitle>Important Note</AlertTitle>
+            <AlertDescription>
+              Be sure to follow the correct format when creating your template. For more information, refer to the  
+              <Link href="/documentation" className="font-medium underline ml-1">
+              documentation.
+              </Link>
+            </AlertDescription>
+          </Alert>
           <div className="mb-4">
             <Label htmlFor="practicalCount">Number of Practicals</Label>
             <Input

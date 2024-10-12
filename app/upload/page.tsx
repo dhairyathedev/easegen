@@ -80,7 +80,7 @@ export default function Upload() {
           <CardTitle className="text-2xl font-bold mb-4">Upload Template</CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert className="my-3">
+          <Alert className="my-3" variant="destructive">
             <AlertTitle>Important Note</AlertTitle>
             <AlertDescription>
               Be sure to follow the correct format when creating your template. For more information, refer to the  

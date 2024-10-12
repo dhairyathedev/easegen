@@ -128,8 +128,9 @@ export default function Documentation() {
             <li>Regularly save your progress when entering data for multiple practicals.</li>
             <li>If you encounter any issues with formatting or placeholder replacement, double-check your template and placeholder mappings.</li>
             <li>For code execution, ensure you&apos;ve selected the correct programming language.</li>
-            <li>When using terminal-style output images, make sure your template has enough space to accommodate the images.</li>
-            <li>If you need to make changes after generating a file, it&apos;s often easier to edit the project in the Practical File Builder and regenerate the document rather than editing the DOCX file directly.</li>
+            <li>If code execution fails, click on <span className="font-medium">Generate Code</span> button again and then execute again.</li>
+            {/* <li>When using terminal-style output images, make sure your template has enough space to accommodate the images.</li> */}
+            <li>If you need to make changes after generating a file, it&apos;s often easier to edit the project in the Easegen and regenerate the document rather than editing the DOCX file directly.</li>
           </ul>
         </CardContent>
       </Card>
