@@ -42,6 +42,12 @@ export default function Documentation() {
         </CardHeader>
         <CardContent className="space-y-4">
           <ol className="list-decimal list-inside space-y-2">
+            <li>Demo Template: 
+
+            <Link href="https://docs.google.com/document/d/1FR8_MpVUK5XsE77CdH5RZjv4FlodkmOOvh7eL7qRtqc/edit?usp=sharing" className="font-medium underline ml-1 text-primary">
+              Google Docs Link
+            </Link>
+            </li>
             <li>Open a new document in Google Docs.</li>
             <li>Create your desired layout for a single practical entry.</li>
             <li>Use double curly braces to denote placeholders, e.g., {"{{title}}"}, {"{{aim}}"}, {"{{code}}"}, {"{{output}}"}, {"{{conclusion}}"}</li>
