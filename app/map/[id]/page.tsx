@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 
 // Helper function to clean placeholders
 const cleanPlaceholder = (placeholder: string) => {
@@ -64,7 +65,7 @@ export default function Map({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+    <div className="flex flex-col items-center justify-center min-h-screen py-2 px-4">
       <h1 className="text-4xl font-bold mb-8">Map Placeholders</h1>
       <form onSubmit={handleSubmit} className="w-full max-w-md">
         {placeholders.map(placeholder => (
@@ -81,12 +82,13 @@ export default function Map({ params }: { params: { id: string } }) {
             />
           </div>
         ))}
-        <button
+        <Button
           type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          // className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="w-full"
         >
           Next
-        </button>
+        </Button>
       </form>
     </div>
   )
