@@ -22,6 +22,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle2 } from "lucide-react"
+import { Disclaimer } from './Disclaimer'
 
 const formSchema = z.object({
   email: z.string().email({
@@ -35,6 +36,7 @@ const formSchema = z.object({
 export default function AuthForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -103,6 +105,10 @@ export default function AuthForm() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (!disclaimerAccepted) {
+    return <Disclaimer onAccept={() => setDisclaimerAccepted(true)} />
   }
 
   return (
