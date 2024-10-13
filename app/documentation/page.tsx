@@ -22,7 +22,7 @@ export default function Documentation() {
           </Link>
         </div>
       </nav>
-      <h1 className="sm:text-4xl text-3xl font-bold mb-6">Practical File Builder Documentation</h1>
+      <h1 className="sm:text-4xl text-3xl font-bold mb-6">General Documentation</h1>
 
       <Alert>
         <AlertTriangle className="h-4 w-4" />
