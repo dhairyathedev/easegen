@@ -39,7 +39,7 @@ export function Disclaimer({ onAccept }: DisclaimerProps) {
             Disclaimer and Liability
           </h3>
           <p>
-            The Practical File Builder is a tool designed to assist in the generation of templates for practical files. It is not intended to replace individual effort or circumvent academic integrity policies.
+            The Easegen is a tool designed to assist in the generation of templates for practical files. It is not intended to replace individual effort or circumvent academic integrity policies.
           </p>
           <p className="font-semibold">
             Dhairya Shah, the creator of this tool, will not be liable for any offense, academic misconduct, or violation of university guidelines and submission terms resulting from the misuse of this tool.
@@ -49,7 +49,7 @@ export function Disclaimer({ onAccept }: DisclaimerProps) {
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Best Practices</h3>
           <ul className="list-disc list-inside space-y-1">
-            <li>Use the Practical File Builder only for generating template structures and layouts.</li>
+            <li>Use the Easegen only for generating template structures and layouts.</li>
             <li>Always write your own code and content for your practical assignments.</li>
             <li>Use the tool to understand formatting requirements, not to generate actual assignment content.</li>
             <li>Consult with your instructors if you have any doubts about the appropriate use of this tool.</li>
@@ -76,7 +76,7 @@ export function Disclaimer({ onAccept }: DisclaimerProps) {
               onCheckedChange={(checked) => setResponsibilityAccepted(checked as boolean)}
             />
             <label htmlFor="responsibility" className="text-sm">
-              I accept full responsibility for my use of the Practical File Builder and will comply with my institution&apos;s academic integrity policies.
+              I accept full responsibility for my use of the Easegen and will comply with my institution&apos;s academic integrity policies.
             </label>
           </div>
         </div>
