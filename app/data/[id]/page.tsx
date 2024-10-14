@@ -1,60 +1,59 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import Link from "next/link";
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import Link from "next/link"
 
 const CodeEditor = dynamic(
   () => import("@uiw/react-textarea-code-editor").then((mod) => mod.default),
   { ssr: false }
-);
+)
 
 interface FieldType {
-  name: string;
-  isCode: boolean;
-  isImage: boolean;
-  isAim: boolean;
-  isOutput: boolean;
-  isConclusion?: boolean; // Added for conclusion
-  defaultLanguage?: string;
+  name: string
+  isCode: boolean
+  isImage: boolean
+  isAim: boolean
+  isOutput: boolean
+  isConclusion?: boolean
+  defaultLanguage?: string
 }
 
-export default function DataEntry({ params }: { params: { id: string } }) {
-  const [mappings, setMappings] = useState<Record<string, string>>({});
-  const [fieldTypes, setFieldTypes] = useState<Record<string, FieldType>>({});
-  const [practicalCount, setPracticalCount] = useState(1);
+export default function Component({ params }: { params: { id: string } }) {
+  const [mappings, setMappings] = useState<Record<string, string>>({})
+  const [fieldTypes, setFieldTypes] = useState<Record<string, FieldType>>({})
+  const [practicalCount, setPracticalCount] = useState(1)
   const [practicalData, setPracticalData] = useState<
     Record<string, string | File>[]
-  >([{}]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const [conclusion, setConclusion] = useState<string>("");
+  >([{}])
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [isExecuting, setIsExecuting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     fetch(`/api/mappings/${params.id}`)
       .then((res) => res.json())
       .then((data) => {
-        setMappings(data.mappings);
-        const initialFieldTypes: Record<string, FieldType> = {};
+        setMappings(data.mappings)
+        const initialFieldTypes: Record<string, FieldType> = {}
         Object.values(data.mappings).forEach((field: any) => {
           initialFieldTypes[field] = {
             name: field,
@@ -63,26 +62,26 @@ export default function DataEntry({ params }: { params: { id: string } }) {
             isAim: false,
             isOutput: false,
             isConclusion: false,
-          };
-        });
-        setFieldTypes(initialFieldTypes);
+          }
+        })
+        setFieldTypes(initialFieldTypes)
       })
-      .catch((err) => setError("Failed to load mappings"));
-  }, [params.id]);
+      .catch((err) => setError("Failed to load mappings"))
+  }, [params.id])
 
   const handlePracticalCountChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const count = parseInt(e.target.value);
-    setPracticalCount(count);
+    const count = parseInt(e.target.value)
+    setPracticalCount(count)
     setPracticalData((prev) => {
-      const newData = [...prev];
+      const newData = [...prev]
       while (newData.length < count) {
-        newData.push({});
+        newData.push({})
       }
-      return newData.slice(0, count);
-    });
-  };
+      return newData.slice(0, count)
+    })
+  }
 
   const handleDataChange = (
     practicalIndex: number,
@@ -90,11 +89,11 @@ export default function DataEntry({ params }: { params: { id: string } }) {
     value: string | File
   ) => {
     setPracticalData((prev) => {
-      const newData = [...prev];
-      newData[practicalIndex] = { ...newData[practicalIndex], [field]: value };
-      return newData;
-    });
-  };
+      const newData = [...prev]
+      newData[practicalIndex] = { ...newData[practicalIndex], [field]: value }
+      return newData
+    })
+  }
 
   const handleFieldTypeChange = (
     field: string,
@@ -117,8 +116,8 @@ export default function DataEntry({ params }: { params: { id: string } }) {
           ? { isCode: false, isImage: false, isAim: false, isOutput: false }
           : {}),
       },
-    }));
-  };
+    }))
+  }
 
   const handleDefaultLanguageChange = (field: string, language: string) => {
     setFieldTypes((prev) => ({
@@ -127,36 +126,36 @@ export default function DataEntry({ params }: { params: { id: string } }) {
         ...prev[field],
         defaultLanguage: language,
       },
-    }));
-  };
+    }))
+  }
 
   const handleGenerateCode = async (practicalIndex: number) => {
     const aimField = Object.entries(fieldTypes).find(
       ([_, type]) => type.isAim
-    )?.[0];
+    )?.[0]
     const codeField = Object.entries(fieldTypes).find(
       ([_, type]) => type.isCode
-    )?.[0];
+    )?.[0]
 
     const aim = aimField
       ? (practicalData[practicalIndex]?.[aimField] as string)
-      : undefined;
+      : undefined
     const language = codeField
       ? fieldTypes[codeField].defaultLanguage
-      : undefined;
+      : undefined
 
     if (!language) {
-      setError("Please select a programming language to generate code.");
-      return;
+      setError("Please select a programming language to generate code.")
+      return
     }
 
     if (!codeField) {
-      setError("Please mark a field as Code to generate code.");
-      return;
+      setError("Please mark a field as Code to generate code.")
+      return
     }
 
-    setIsGenerating(true);
-    setError(null);
+    setIsGenerating(true)
+    setError(null)
 
     try {
       const response = await fetch("/api/generate-code", {
@@ -165,49 +164,48 @@ export default function DataEntry({ params }: { params: { id: string } }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ aim, language }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (response.ok) {
-        handleDataChange(practicalIndex, codeField, data.code);
+        handleDataChange(practicalIndex, codeField, data.code)
       } else {
-        setError(data.error || "Code generation failed");
+        setError(data.error || "Code generation failed")
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError("An unexpected error occurred during code generation");
+      console.error("Error:", error)
+      setError("An unexpected error occurred during code generation")
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(false)
     }
-  };
+  }
 
   const handleGenerateConclusion = async (practicalIndex: number) => {
-    setIsGenerating(true);
+    setIsGenerating(true)
     try {
       const response = await fetch("/api/generate-conclusion", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ practicalData:practicalData[practicalIndex] }),
-      });
+        body: JSON.stringify({ practicalData: practicalData[practicalIndex] }),
+      })
 
-      const data = await response.json();
-      setConclusion(data.conclusion);
+      const data = await response.json()
 
       if (response.ok) {
-        handleDataChange(practicalIndex, "conclusion", data.conclusion);
+        handleDataChange(practicalIndex, "conclusion", data.conclusion)
       } else {
-        setError(data.error || "Conclusion generation failed");
+        setError(data.error || "Conclusion generation failed")
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError("An unexpected error occurred during conclusion generation");
+      console.error("Error:", error)
+      setError("An unexpected error occurred during conclusion generation")
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(false)
     }
-  };
+  }
 
   const formatOutput = (language: string, output: string): string => {
     const commandMap: Record<string, string> = {
@@ -215,36 +213,36 @@ export default function DataEntry({ params }: { params: { id: string } }) {
       javascript: "node app.js",
       java: "javac Main.java && java Main",
       cpp: "g++ main.cpp -o main && ./main",
-    };
+    }
 
-    const command = commandMap[language] || "Unknown command";
-    return `~ ${command}\n${output}`;
-  };
+    const command = commandMap[language] || "Unknown command"
+    return `~ ${command}\n${output}`
+  }
 
   const handleExecuteCode = async (practicalIndex: number) => {
-    setIsExecuting(true);
-    setError(null);
+    setIsExecuting(true)
+    setError(null)
 
     const codeField = Object.entries(fieldTypes).find(
       ([_, type]) => type.isCode
-    )?.[0];
+    )?.[0]
     const outputField = Object.entries(fieldTypes).find(
       ([_, type]) => type.isOutput
-    )?.[0];
+    )?.[0]
 
     if (!codeField || !outputField) {
-      setError("Please mark fields for Code and Output");
-      setIsExecuting(false);
-      return;
+      setError("Please mark fields for Code and Output")
+      setIsExecuting(false)
+      return
     }
 
-    const code = practicalData[practicalIndex]?.[codeField] as string;
-    const language = fieldTypes[codeField].defaultLanguage;
+    const code = practicalData[practicalIndex]?.[codeField] as string
+    const language = fieldTypes[codeField].defaultLanguage
 
     if (!code || !language) {
-      setError("Code or language is missing");
-      setIsExecuting(false);
-      return;
+      setError("Code or language is missing")
+      setIsExecuting(false)
+      return
     }
 
     try {
@@ -261,97 +259,96 @@ export default function DataEntry({ params }: { params: { id: string } }) {
             stdin: "",
           }),
         }
-      );
+      )
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (response.ok) {
-        const result = await pollForResult(data.token);
+        const result = await pollForResult(data.token)
         const formattedOutput = formatOutput(
           language,
           result.stdout || result.stderr || "No output"
-        );
-        handleDataChange(practicalIndex, outputField, formattedOutput);
+        )
+        handleDataChange(practicalIndex, outputField, formattedOutput)
       } else {
-        setError(data.error || "Code execution failed");
+        setError(data.error || "Code execution failed")
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError("An unexpected error occurred during code execution");
+      console.error("Error:", error)
+      setError("An unexpected error occurred during code execution")
     } finally {
-      setIsExecuting(false);
+      setIsExecuting(false)
     }
-  };
+  }
 
   const getLanguageId = (language: string): number => {
     const languageMap: Record<string, number> = {
-      python: 71, // Python (3.8.1)
-      javascript: 63, // JavaScript (Node.js 12.14.0)
-      java: 62, // Java (OpenJDK 13.0.1)
-      cpp: 54, // C++ (GCC 9.2.0)
-    };
-    return languageMap[language] || 71; // Default to Python if language not found
-  };
+      python: 71,
+      javascript: 63,
+      java: 62,
+      cpp: 54,
+    }
+    return languageMap[language] || 71
+  }
 
   const pollForResult = async (token: string): Promise<any> => {
-    const maxAttempts = 10;
-    const delay = 2000; // 2 seconds
+    const maxAttempts = 10
+    const delay = 2000
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const response = await fetch(
         `https://api.compiler.dhairyashah.dev/submissions/${token}`
-      );
-      const data = await response.json();
+      )
+      const data = await response.json()
 
       if (data.status.id === 3) {
-        // Assuming 3 means completed
-        return data;
+        return data
       }
 
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay))
     }
 
-    throw new Error("Execution timed out");
-  };
+    throw new Error("Execution timed out")
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsGenerating(true);
-    setError(null);
+    e.preventDefault()
+    setIsGenerating(true)
+    setError(null)
 
-    const formData = new FormData();
-    formData.append("id", params.id);
-    formData.append("practicalData", JSON.stringify(practicalData));
-    formData.append("fieldTypes", JSON.stringify(fieldTypes));
+    const formData = new FormData()
+    formData.append("id", params.id)
+    formData.append("practicalData", JSON.stringify(practicalData))
+    formData.append("fieldTypes", JSON.stringify(fieldTypes))
 
     practicalData.forEach((practical, index) => {
       Object.entries(practical).forEach(([field, value]) => {
         if (value instanceof File) {
-          formData.append(`image_${index}_${field}`, value);
+          formData.append(`image_${index}_${field}`, value)
         }
-      });
-    });
+      })
+    })
 
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
         body: formData,
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (response.ok) {
-        router.push(`/preview/${data.fileId}`);
+        router.push(`/preview/${data.fileId}`)
       } else {
-        setError(data.error || "Generation failed");
+        setError(data.error || "Generation failed")
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError("An unexpected error occurred");
+      console.error("Error:", error)
+      setError("An unexpected error occurred")
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(false)
     }
-  };
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -362,12 +359,12 @@ export default function DataEntry({ params }: { params: { id: string } }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-        <Alert className="mb-3" variant="default">
+          <Alert className="mb-3" variant="default">
             <AlertTitle>Important Note</AlertTitle>
             <AlertDescription>
               Be sure to follow the correct format when creating your template. For more information, refer to the  
               <Link href="/documentation" className="font-medium underline ml-1">
-              documentation.
+                documentation.
               </Link>
             </AlertDescription>
           </Alert>
@@ -450,6 +447,7 @@ export default function DataEntry({ params }: { params: { id: string } }) {
           <form onSubmit={handleSubmit} className="space-y-6">
             {Array.from({ length: practicalCount }).map((_, index) => (
               <Card key={index} className="p-4">
+                
                 <CardTitle className="text-xl font-bold mb-4">
                   Block {index + 1}
                 </CardTitle>
@@ -460,12 +458,8 @@ export default function DataEntry({ params }: { params: { id: string } }) {
                       {fieldTypes[field]?.isCode ? (
                         <div>
                           <CodeEditor
-                            value={
-                              (practicalData[index]?.[field] as string) || ""
-                            }
-                            language={
-                              fieldTypes[field].defaultLanguage || "cpp"
-                            }
+                            value={(practicalData[index]?.[field] as string) || ""}
+                            language={fieldTypes[field].defaultLanguage || "cpp"}
                             placeholder="Enter your code here"
                             onChange={(evn) =>
                               handleDataChange(index, field, evn.target.value)
@@ -473,9 +467,10 @@ export default function DataEntry({ params }: { params: { id: string } }) {
                             padding={15}
                             style={{
                               fontSize: 12,
-                              backgroundColor: "#000000",
+                              backgroundColor: "#f4f4f4",
                               fontFamily:
                                 "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+                              color: "#333", // Add this line to set the text color
                             }}
                           />
                           <div className="mt-2 space-x-2">
@@ -501,42 +496,38 @@ export default function DataEntry({ params }: { params: { id: string } }) {
                           type="file"
                           accept="image/*"
                           onChange={(e) => {
-                            const file = e.target.files?.[0];
+                            const file = e.target.files?.[0]
                             if (file) {
-                              handleDataChange(index, field, file);
+                              handleDataChange(index, field, file)
                             }
                           }}
                         />
-) : fieldTypes[field]?.isOutput ? (
-  <CodeEditor
-                            value={
-                              (practicalData[index]?.[field] as string) || ""
-                            }
-                            language={
-                              fieldTypes[field].defaultLanguage || "cpp"
-                            }
-                            placeholder="Enter your code here"
-                            onChange={(e) =>
-                              handleDataChange(index, field, e.target.value)
-                            }
-                            padding={15}
-                            style={{
-                              fontSize: 12,
-                              backgroundColor: "#000000",
-                              fontFamily:
-                                "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-                            }}
-                            readOnly={fieldTypes[field]?.isOutput}
+                      ) : fieldTypes[field]?.isOutput ? (
+                        <CodeEditor
+                          value={(practicalData[index]?.[field] as string) || ""}
+                          language={fieldTypes[field].defaultLanguage || "cpp"}
+                          placeholder="Output will appear here"
+                          onChange={(e) =>
+                            handleDataChange(index, field, e.target.value)
+                          }
+                          padding={15}
+                          style={{
+                            fontSize: 12,
+                            backgroundColor: "#f4f4f4",
+                            fontFamily:
+                              "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+                            color: "#333", // Add this line to set the text color
+                          }}
+                        />
+                      ) : fieldTypes[field]?.isConclusion ? (
+                        <>
+                          <Textarea
+                            id={`${field}-${index}`}
+                            value={(practicalData[index]?.[field] as string) || ""}
+                            onChange={(e) => handleDataChange(index, field, e.target.value)}
+                            placeholder="Enter or generate conclusion here"
                           />
-) : fieldTypes[field]?.isConclusion ? (
-  <>
-  <Textarea
-    id={`${field}-${index}`}
-    value={(practicalData[index]?.[field] as string) || ""}
-    onChange={(e) => setConclusion(e.target.value)}
-    placeholder="Conclusion will appear here"
-  />
-  <div className="mt-2 space-x-2">
+                          <div className="mt-2 space-x-2">
                             <Button
                               type="button"
                               onClick={() => handleGenerateConclusion(index)}
@@ -545,22 +536,20 @@ export default function DataEntry({ params }: { params: { id: string } }) {
                               Generate Conclusion
                             </Button>
                           </div>
-                          </>
-):  (
-  <Input
-    id={`${field}-${index}`}
-    type="text"
-    value={
-      (practicalData[index]?.[field] as string) || ""
-    }
-    onChange={(e) =>
-      handleDataChange(index, field, e.target.value)
-    }
-  />
-)}
-</div>
-))}
-</div>
+                        </>
+                      ) : (
+                        <Input
+                          id={`${field}-${index}`}
+                          type="text"
+                          value={(practicalData[index]?.[field] as string) || ""}
+                          onChange={(e) =>
+                            handleDataChange(index, field, e.target.value)
+                          }
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </Card>
             ))}
             <Button
@@ -584,5 +573,5 @@ export default function DataEntry({ params }: { params: { id: string } }) {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
